@@ -23,5 +23,25 @@ const fetchMyIP = function (callback) {
   });
 };
 
+const fetchCoordsByIP = function(ip, callback) {
+  request(`https://ipwho.is/${ip}`, (error, response, body) => {
+    if (error) {
+      callback(error, null);
+      return;
+    }
 
-module.exports = { fetchMyIP };
+    const parsedBody = JSON.parse(body);
+
+    if (!parsedBody.success) {
+      const message = `Success status was ${parsedBody.success}. Server message says: ${parsedBody.message} when fetching for IP ${parsedBody.ip}`;
+      callback(Error(message), null);
+      return;
+    }
+
+    const { latitude, longitude } = parsedBody;
+   
+    callback(null, { latitude, longitude });
+  });
+};
+
+module.exports = { fetchCoordsByIP };
